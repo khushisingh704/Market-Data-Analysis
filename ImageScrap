@@ -1,0 +1,38 @@
+from duckduckgo_search import DDGS
+import os
+import requests
+
+def download_image(url, filepath):
+    try:
+        response = requests.get(url, timeout=10)
+        with open(filepath, "wb") as f:
+            f.write(response.content)
+    except Exception as e:
+        print(f"Failed to download {url}: {e}")
+
+def main():
+    input_file = r"C:\Users\khush\OneDrive\Desktop\PowerBI Folder\Marketing Performance Optimization\img.txt"
+    output_folder = r"C:\Users\khush\OneDrive\Desktop\PowerBI Folder\Marketing Performance Optimization\Images"
+    os.makedirs(output_folder, exist_ok=True)
+
+    with open(input_file, "r", encoding="utf-8") as file:
+        lines = file.readlines()
+
+    with DDGS() as ddgs:
+        for line in lines:
+            query = line.strip()
+            if not query:
+                continue
+            
+            print(f"Searching image for: {query}")
+            results = ddgs.images(keywords=query, max_results=1)
+            for result in results:
+                img_url = result["image"]
+                filename = f"{query.replace(' ', '_')}.jpg"
+                filepath = os.path.join(output_folder, filename)
+                download_image(img_url, filepath)
+                print(f"Downloaded: {filename}")
+                break  # Only download one image
+
+if __name__ == "__main__":
+    main()
